@@ -32,9 +32,26 @@
   <script type="text/babel" data-presets="env,react">
     document.getElementById("root").innerHTML =
   "<div style='padding:16px;font-family:monospace;background:#111;color:#fff'>Babel script started…</div>";
+    // --- HARD ERROR OVERLAY (zeigt Fehler direkt im UI) ---
+window.onerror = function (message, source, lineno, colno, error) {
+  const msg = `ERROR: ${message}\n@ ${lineno}:${colno}\n${source || ""}`;
+  console.error(msg, error);
+
+  const root = document.getElementById("root");
+  if (root) {
+    root.innerHTML =
+      `<div style="padding:16px;font-family:monospace;background:#300;color:#fff;white-space:pre-wrap">
+${msg}
+
+${(error && error.stack) ? error.stack : ""}
+</div>`;
+  }
+};
     console.log("BABEL START OK");
     // ---- DEBUG (leave for now; remove later) ----
     console.log("BOOT", { React: typeof React, ReactDOM: typeof ReactDOM, Recharts: typeof Recharts });
+    if (!window.React || !window.ReactDOM) throw new Error("React/ReactDOM not loaded");
+if (!window.Recharts) throw new Error("Recharts not loaded (window.Recharts is undefined)");
 
     window.addEventListener("error", (e) => console.error("WINDOW ERROR:", e.message, e.error));
     window.addEventListener("unhandledrejection", (e) => console.error("PROMISE REJECTION:", e.reason));
@@ -46,7 +63,7 @@
     const {
       LineChart, Line, XAxis, YAxis, ReferenceLine,
       ResponsiveContainer, ComposedChart, Tooltip
-    } = Recharts;
+   } = window.Recharts;
 
     // Black-Scholes
     const normalCDF = (x) => {
